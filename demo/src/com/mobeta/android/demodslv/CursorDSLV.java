@@ -18,6 +18,7 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -79,7 +80,7 @@ public class CursorDSLV extends FragmentActivity implements LoaderCallbacks<Curs
 
         String[] cols = {"name"};
         int[] ids = {R.id.text};
-        adapter = new SimpleDragSortCursorAdapter(this,
+        adapter = new DebugSimpleDragSortCursorAdapter(this,
                 R.layout.list_item_click_remove, null, cols, ids, 0);
 
         DragSortListView dslv = (DragSortListView) findViewById(android.R.id.list);
@@ -113,5 +114,27 @@ public class CursorDSLV extends FragmentActivity implements LoaderCallbacks<Curs
     public void onDestroy() {
         super.onDestroy();
         mOpenHelper.close();
+    }
+
+    private class DebugSimpleDragSortCursorAdapter extends SimpleDragSortCursorAdapter {
+        private static final String TAG = "DebugSimpleDragSortCursorAdapter";
+        private int getViewCount = 0;
+
+        public DebugSimpleDragSortCursorAdapter(Context context, int layout,
+                Cursor c, String[] from, int[] to, int flags) {
+            super(context, layout, c, from, to, flags);
+        }
+
+        @SuppressWarnings("deprecation")
+        public DebugSimpleDragSortCursorAdapter(Context context, int layout,
+                Cursor c, String[] from, int[] to) {
+            super(context, layout, c, from, to);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            Log.d(TAG, "getView | position=" + String.valueOf(position) + " count=" + String.valueOf(++getViewCount));
+            return super.getView(position, convertView, parent);
+        }
     }
 }
